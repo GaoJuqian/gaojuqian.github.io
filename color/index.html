@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国传统色-故宫里的色彩美学</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/themes/light.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/shoelace.js"></script>
+
+    <style>
+        *{margin: 0;padding: 0;list-style: none;}
+        button{border: none;display: block;text-align: left;outline: none;}
+        button::after {
+            border: none;
+        }
+        button:focus{
+            border: none;
+            outline: none;
+        }
+        body{
+            width: 100vw;
+            overflow-x: hidden;
+        }
+        main{
+            height: 100vh;
+            width: 100vw;
+            transition-property: background, opacity;
+            transition-duration:  .3s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        #currentShow{
+            color: #fff;
+            box-sizing: border-box;
+            padding: 3rem;
+            /* user-select: none; */
+            transition: all .3s;
+        }
+        #currentShow #name{
+            font-size: 6.4rem;
+            word-spacing: 2em;
+        }
+
+        #colorList{
+            padding: 2rem;
+            /* background-color: rgba(0,0,0, .1); */
+            color: #fff;
+            transition: all .3s;
+            z-index: 1;
+            width: 30rem;
+            margin-left: auto;
+        }
+        .colorList_item{
+            border-radius: 6px;
+            /* background-color: rgba(0,0,0, .1); */
+            box-sizing: border-box;
+            padding: 1rem;
+            width: 30rem;
+            margin: 2rem 0;
+            cursor: pointer;
+            color: #fff;
+            /* user-select: none; */
+        }
+        .colorList_item:active{
+            border-radius: 6px;
+            background-color: #f4f4f4 !important;
+            color: rgba(0,0,0, .8);
+        }
+        .colorList_item h1{
+            font-size: 2.4rem;
+        }
+        .colorList_item h2{
+            font-size: 1.4rem;
+        }
+
+        .control{
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+        }
+        .action{
+            height: 2.5rem;
+            width: 2.5rem;
+            background-size: 100%;
+            opacity: .3;
+            z-index: 1;
+            margin: 0 .5rem;
+            cursor: pointer;
+        }
+        
+    </style>
+
+</head>
+<body style="display: none;">
+
+    <div style="position: fixed;left: 0;top: 0;">
+        <sl-alert type="primary" duration="3000" open>
+            <sl-icon slot="icon" name="info-circle"></sl-icon>
+            <pre>颜色进度 63/384</pre>
+          </sl-alert>
+    </div>
+
+    <main>
+        <article id="currentShow">
+            <h1 id="name">
+                <!-- <ruby>
+                    人<rp>(</rp><rt>rén</rt><rp>)</rp>
+                    籁<rp>(</rp><rt>lài</rt><rp>)</rp>
+                </ruby> -->
+            </h1>
+            <h2 id="CMYK">
+                <!-- CMYK<pre>45%,10%,100%,0%</pre> -->
+            </h2>
+            <h2 id="RGB">
+                <!-- RGB<pre>158,188,25</pre> -->
+            </h2>
+        </article>
+    </main>
+
+
+    <div  style="overflow: hidden;">
+        <article id="colorList">
+        
+        </article>
+    </div>
+    
+
+
+    <div class="control">
+        <div class="action" id="action"></div>
+        <div class="action" id="actionDark"></div>
+        <div class="action" id="actionWhite"></div>
+        <div class="action" id="actionClose"></div>
+    </div>
+        
+
+    
+</body>
+</html>
+
+<script>
+    (function () {
+    function setFont() {
+      let cWidth = document.documentElement.clientWidth;
+      var size = cWidth / 37.5;
+      if (cWidth > 1080){
+        size = 12
+      }
+      document.documentElement.style.fontSize = size + 'px';
+      return setFont;
+    }
+
+    window.addEventListener('resize', setFont(), false);
+  })();
+</script>
+
+<script>
+    function pageInit(){
+        try {
+        const colorJson = [
+        // line 18
+        {"name": "人籁", "PY": ['rén', 'lài'], "CMYK": [45,10,100,0], "RGB": [158,188,25], "page": "077"},
+        {"name": "青粲", "PY": ['qīng', 'càn'], "CMYK": [35,0,90,0], "RGB": [195,217,78], "page": "077"},
+        {"name": "翠缥", "PY": ['cuì', 'piǎo'], "CMYK": [35, 0,90,0], "RGB": [183,211,50], "page": "077"},
+        {"name": "水龙吟", "PY": ['shuǐ', 'lóng', 'yín'],  "CMYK": [55,20,100,0], "RGB": [132,167,41], "page": "077"},
+        {"name": "碧山", "PY": ['bì', 'shān'], "CMYK": [60,30,85,0], "RGB": [119,150,73], "page": "027"},
+        {"name": "石发", "PY": ['shí', 'fā'], "CMYK": [65,35,80,0], "RGB": [106,141,82], "page": "087"},
+        {"name": "菉竹", "PY": ['lù', 'zhú'], "CMYK": [65,35,65,0], "RGB": [105,142,106], "page": "123"},
+        {"name": "庭芜绿", "PY": ['tíng','wú','lǜ'], "CMYK": [65,30,75,0], "RGB": [104,148,92], "page": "055"},
+        {"name": "葱倩", "PY": ['cōng','qiàn'], "CMYK": [65,40,80,0], "RGB": [108,134,80], "page": "151"},
+        {"name": "漆姑", "PY": ['qī','gū'], "CMYK": [70,40,80,0], "RGB": [93,131,81], "page": "087"},
+        {"name": "翠微", "PY": ['cuì','wēi'], "CMYK": [75,40,90,0], "RGB": [76,128,69], "page": "055"},
+        {"name": "芰荷", "PY": ['jì','hé'], "CMYK": [75,45,85,0], "RGB": [79,121,74], "page": "087"},
+        {"name": "青青", "PY": ['qīng','qīng'], "CMYK": [75,50,85,5], "RGB": [79,111,70], "page": "027"},
+        {"name": "翠虬", "PY": ['cuì','qiú'], "CMYK": [80,55,100,0], "RGB": [68,106,55], "page": "055"},
+        {"name": "官绿", "PY": ['guān','lǜ'], "CMYK": [85,50,95,0], "RGB": [42,110,63], "page": "087"},
+        {"name": "油绿", "PY": ['yóu','lǜ'], "CMYK": [70,50,70,5], "RGB": [93,114,89], "page": "225"},
+        {"name": "莓莓", "PY": ['méi','méi'], "CMYK": [75,55,80,10], "RGB": [78,101,72], "page": "225"},
+        {"name": "螺青", "PY": ['luó','qīng'], "CMYK": [80,65,85,20], "RGB": [63,80,59], "page": "225"},
+
+        // ***************************************************************************************************************
+        // line 7
+        {"name": "春辰", "PY": ['chūn','chén'], "CMYK": [40,15,60,0], "RGB": [169,190,123], "page": "027"},
+        {"name": "麹尘", "PY": ['qū','chén'], "CMYK": [30,10,45,0], "RGB": [192,208,157], "page": "147"},
+        {"name": "欧碧", "PY": ['ōu','bì'], "CMYK": [30,5,50,0], "RGB": [192,214,149], "page": "027"},
+        {"name": "苍葭", "PY": ['cāng','jiā'], "CMYK": [40,15,50,0], "RGB": [168,191,143], "page": "055"},
+        {"name": "兰苕", "PY": ['lán','tiáo'], "CMYK": [40,20,50,0], "RGB": [168,183,140], "page": "151"},
+        {"name": "青玉案", "PY": ['qīng','yù','àn'], "CMYK": [40,25,45,0], "RGB": [168,176,146], "page": "095"},
+        {"name": "碧滋", "PY": ['bì','zī'], "CMYK": [50,30,55,0], "RGB": [144,160,125], "page": "151"},
+
+        // ***************************************************************************************************************
+        // line 15
+        {"name": "瓷秘", "PY": ['cí','mì'], "CMYK": [30,20,45,0], "RGB": [191,192,150], "page": "093"},
+        {"name": "筠雾", "PY": ['yún','wù'], "CMYK": [20,15,35,0], "RGB": [213,209,174], "page": "093"},
+        {"name": "行香子", "PY": ['háng', 'xiāng', 'zǐ'], "CMYK": [30,25,40,0], "RGB": [191,185,156], "page": "111"},
+        {"name": "呜珂", "PY": ['wū','kē'], "CMYK": [35,25,40,0], "RGB": [179,181,156], "page": "095"},
+        {"name": "蜿琰", "PY": ['wān','yǎn'], "CMYK": [40,30,50,0], "RGB": [169,168,134], "page": "093"},
+        {"name": "出岫", "PY": ['chū','xiù'], "CMYK": [40,30,60,0], "RGB": [169,167,115], "page": "095"},
+        {"name": "王刍", "PY": ['wáng','chú'], "CMYK": [40,35,60,0], "RGB": [169,159,112], "page": "111"},
+        {"name": "春碧", "PY": ['chūn','bì'], "CMYK": [45,35,50,0], "RGB": [157,157,130], "page": "047"},
+        {"name": "执大象", "PY": ['zhí', 'dà', 'xiàng'], "CMYK": [50,40,55,0], "RGB": [145,145,119], "page": "047"},
+        {"name": "青圭", "PY": ['qīng','guī'], "CMYK": [50,40,70,0], "RGB": [146,144,93], "page": "093"},
+        {"name": "绿沈", "PY": ['lǜ','shěn'], "CMYK": [50,40,80,0], "RGB": [147,143,76], "page": "147"},
+        {"name": "风入松", "PY": ['fēng', 'rù','sōng'], "CMYK": [55,40,80,0], "RGB": [143,140,78], "page": "095"},
+        {"name": "荩箧", "PY": ['jìn','qiè'], "CMYK": [55,50,75,0], "RGB": [135,125,82], "page": "111"},
+        {"name": "绞衣", "PY": ['jiǎo','yī'], "CMYK": [55,50,75,10], "RGB": [127,117,76], "page": "147"},
+        {"name": "素綦", "PY": ['sù','qí'], "CMYK": [70,65,90,20], "RGB": [89,83,51], "page": "147"},
+
+        // ***************************************************************************************************************
+        // line 21
+        {"name": "苍筤", "PY": ['cāng','láng'], "CMYK": [45,15,35,0], "RGB": [153,188,172], "page": "015"},
+        {"name": "天缥", "PY": ['tiān','piǎo'], "CMYK": [20,0,15,0], "RGB": [213,235,225], "page": "015"},
+        {"name": "卵色", "PY": ['luǎn','sè'], "CMYK": [20,5,20,0], "RGB": [213,227,212], "page": "165"},
+        {"name": "沧浪", "PY": ['cāng','làng'], "CMYK": [35,5,25,0], "RGB": [177,213,200], "page": "015"},
+        {"name": "葭菼", "PY": ['jiā','tǎn'], "CMYK": [25,10,25,0], "RGB": [202,215,197], "page": "165"},
+        {"name": "山岚", "PY": ['shān','lán'], "CMYK": [30,10,30,0], "RGB": [190,210,187], "page": "123"},
+        {"name": "冰台", "PY": ['bīng','tái'], "CMYK": [30,15,30,0], "RGB": [190,202,183], "page": "165"},
+        {"name": "青古", "PY": ['qīng','gǔ'], "CMYK": [35,20,35,0], "RGB": [179,189,169], "page": "165"},
+        {"name": "醽醁", "PY": ['líng','lù'], "CMYK": [40,20,30,0], "RGB": [166,186,177], "page": "173"},
+        {"name": "渌波", "PY": ['lù','bō'], "CMYK": [45,20,45,0], "RGB": [155,180,150], "page": "123"},
+        {"name": "青楸", "PY": ['qīng','qiū'], "CMYK": [55,25,55,0], "RGB": [129,163,128], "page": "123"},
+        {"name": "缥碧", "PY": ['piǎo','bì'], "CMYK": [55,25,45,0], "RGB": [128,164,146], "page": "015"},
+        {"name": "翠涛", "PY": ['cuì','tāo'], "CMYK": [55,30,45,0], "RGB": [129,157,142], "page": "173"},
+        {"name": "青梅", "PY": ['qīng','méi'], "CMYK": [60,40,55,0], "RGB": [119,138,119], "page": "173"},
+        {"name": "雀梅", "PY": ['què','méi'], "CMYK": [60,40,60,0], "RGB": [120,138,111], "page": "225"},
+        {"name": "苔古", "PY": ['tái','gǔ'], "CMYK": [60,45,60,0], "RGB": [121,131,108], "page": "047"},
+        {"name": "蕉月", "PY": ['jiāo','yuè'], "CMYK": [50,35,40,10], "RGB": [134,144,138], "page": "159"},
+        {"name": "千山翠", "PY": ['qiān','shān','cuì'], "CMYK": [60,40,50,15], "RGB": [107,125,115], "page": "159"},
+        {"name": "翕赩", "PY": ['xī','xì'], "CMYK": [70,50,60,0], "RGB": [95,118,106], "page": "173"},
+        {"name": "结绿", "PY": ['jié','lǜ'], "CMYK": [70,55,70,20], "RGB": [85,95,77], "page": "159"},
+        {"name": "绿云", "PY": ['lǜ','yún'], "CMYK": [75,65,75,30], "RGB": [69,73,61], "page": "159"},
+        
+        // ***************************************************************************************************************
+        // line 
+        {"name": "丹罽", "PY": ['dān','jì'], "CMYK": [0,100,100,0], "RGB": [230,0,18], "page": "083"},
+        {"name": "黄丹", "PY": ['huáng','dān'], "CMYK": [0,80,95,0], "RGB": [234,85,20], "page": "041"},
+        {"name": "檎丹", "PY": ['qín','dān'], "CMYK": [0,85,85,0], "RGB": [233,72,41], "page": "083"},
+
+
+        // {"name": "", "PY": ['',''], "CMYK": [,0], "RGB": [], "page": ""},
+
+
+
+
+    ]
+
+    console.log(colorJson.length);
+
+    const colorList = colorJson.map((item, index) => {
+        const {page} = item,
+            rgb = item.RGB.join(','),
+            cmyk = item.CMYK.join('%,'),
+            name = "<ruby>" + (
+                item.PY.map((pyItem,pyIndex)=>(
+                    `${item.name[pyIndex]}<rp>(</rp><rt>${pyItem}</rt><rp>)</rp>`
+                )).join('')
+                ) + "</ruby>";
+        return `
+            <button 
+                class="colorList_item"
+                style="background-color: rgb(${rgb});"
+                data-idx="${index}"
+            >
+
+                <h1>${name}</h1>
+                <h2 id="CMYK"><pre>CMYK：${cmyk}%</pre></h2>
+                <h2 id="RGB"><pre>RGB：${rgb}</pre></h2>
+            </button>
+        `
+    })
+
+    return {
+        colorJson,
+        colorList
+    };
+
+    
+
+    } catch (error) {
+        console.log(error);
+    }
+    }
+</script>
+
+<script>
+    const closeImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAABKxJREFUeF7tndF14jAQRSXKScqwa6CdkHaoAZeRlGPn+Ox6l3AAW0Yzmjdv+MXYmnevR5aSkJziRZ1Apq4+ik8hALkEIUAIQJ4AefnRAUIA8gTIy48OEAKQJ0BefnSAEIA8AfLyowOEAOQJkJcfHSAEIE+AvPzoACEAeQLk5UcHCAHIEyAvPzpACECeAHn56h2g67q3nPPxcrmcyLP/VX7f96dpms7DMHxr5qIqwAz/cDicp2l6Tyl9hgR/UM/wU0ofOeevcRyPmhKoCXADf5GcXoIF/hKItgQqAjyATy/BLfwWEogLsAKfVoJH8LUlEBVgI3w6Cdbga0ogJkAhfBoJtsLXkkBEgJ3w3UtQCl9DAhEB9hZ6tf51tzqwmomIANdr2xc2NdxIYBX+zEZMgJDg9yaP1RtBVAB2CSzf+f+eL14wc/NHEYLYXMzGA1FqFu8AS14ogWzk+/QwpFrVBGCZDpDgiz8E3rtN0AIq6QiItal2AM/TASL8Jh3AowSo8JsKUOmZ4HS5XD5L2nTtY/u+/0gpvfLbTU03vJpMAdcQKtw9zSRAh9+8A1ScDtQl8ADfjABo04EX+KYEQJHAE3xzAliXwBt8kwJYlcAjfLMCWJPAK3zTAliRoAJ89RVKyV5H832AtcG23CfwDt98B2i5T8AAH0YA7emABT6UAFoSMMGHE0BaAjb4kAJIScAIH1aA2hKwwocWoJYEf1car/w83/Q6f22ZbX4fYK2ACvsEa5d49j40fPgOUHGfYI8E8PDdCFBpOiiRwAV8VwIoSuAGvjsBFCRwBd+lAIISuIPvVgABCVzCdy1ARQncwg8Btj33N/3DjW1D3H8U/EbQo9IrbxC5lcClAJXhL465lMCdAELw3UrgSgBh+C4lcCOAEnx3ErgQQBm+KwngBWgE340E0AJUgL98ucT8JQ97X9CrA1gBasBf/mVNzXPttajV5yAFkAAmcc5WUEuuCyeAJCjJc5dA0TwWSgANQBrX0AS8di0YATTBaF5rDZD0+xACtADS4prSsO+d37wALUG0vLaWDKYFsADAwhgkZTArgKXgLY2ltgwmBbAYuMUx1ZDBnACWg7Y8tr0ymBIAIWCEMZbIYEYApGCRxromgwkBEANFHLPJfQDkIJHHvsjQtAN4CBC9hmYCoAd33U6Ra2kiAHJgjx6qUGtSFwA1qLWn6fl9xNpUBUAMaAt45OlATQAG+IsISLWqCIAUSOkdj/5MIC4AI3ykTiAqADN8FAnEBAj4/ycHy1mICGC54FpzfOl5KmQi8lU1IgJ0Xfd2OBzO0zS9lwaVUoL+U6tn9e6VIOf8NY7jcRiG7x15Pv2IiADzFXdK4Bb+3mcCSfjzmMQE2CGBe/ilEkjDFxegQAIa+Fsl0ICvIsAGCejgr0mgBV9NgCcS0MJ/JIEmfFUB7khAD/9WAm346gIsEuScj8uXM9Re1qCeb14iTtN0lljqPctEdBWACoNp3CEAE+07tYYAIQB5AuTlRwcIAcgTIC8/OkAIQJ4AefnRAUIA8gTIy48OEAKQJ0BefnSAEIA8AfLyowOEAOQJkJcfHSAEIE+AvPzoACEAeQLk5UcHIBfgB7Pcaq7IfAISAAAAAElFTkSuQmCC";
+    const darkImg = "data:image/png;base64,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";
+    const whiteImg = "data:image/png;base64,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";
+    const showImg = "data:image/png;base64,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";
+    const hideImg = "data:image/png;base64,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";
+    let isShowList = true;
+
+    const currentShow = document.querySelector("#currentShow"),
+        colorList = document.querySelector("#colorList"),
+        mainEl = document.querySelector("main"),
+        action = document.querySelector("#action"),
+        actionDark = document.querySelector("#actionDark"),
+        actionWhite = document.querySelector("#actionWhite"),
+        actionClose = document.querySelector("#actionClose");
+    
+
+    const initData = pageInit();
+    colorList.style.transform = isShowList ? 'translateX(0rem)' : "translateX(40rem)";
+    colorList.innerHTML= initData.colorList.join('');
+    action.style.backgroundImage = `url(${showImg})`;
+    actionDark.style.backgroundImage = `url(${darkImg})`;
+    actionWhite.style.backgroundImage = `url(${whiteImg})`;
+    actionClose.style.backgroundImage = `url(${closeImg})`;
+    setCurrentShow(0);
+
+    
+    // // bla bla bla
+    // const devices = navigator.userAgent;
+    // //是否移动设备
+    // const isMobile = /mobile/i.test(devices);
+    // if(isMobile){
+    //     colorList.addEventListener("touchend", (event)=>{
+    //         const path = event.path || (event.composedPath && event.composedPath())
+    //         // Safari 的事件中，event.path 不存在。
+    //         const datasetEl = path.find(item => item.className == "colorList_item");
+    //         if (typeof datasetEl !== 'undefined'){
+    //             const idx = datasetEl.dataset.idx
+    //             setCurrentShow(idx);
+    //         }
+    //     })
+    // }else{
+        colorList.addEventListener("click", (event)=>{
+            const path = event.path || (event.composedPath && event.composedPath())
+            const datasetEl = path.find(item => item.className == "colorList_item");
+            if (typeof datasetEl !== 'undefined'){
+                const idx = datasetEl.dataset.idx
+                setCurrentShow(idx);
+            }
+        })
+    // }
+
+
+    action.addEventListener("click", (event)=>{
+        isShowList = !isShowList;
+        colorList.style.transform = isShowList ? 'translateX(0rem)' : "translateX(40rem)";
+        action.style.backgroundImage = `url(${isShowList ? showImg : hideImg})`;
+        // document.querySelector('body').style.height = isShowList ? 'unset' : "100vh";
+        // document.querySelector('body').style.width = isShowList ? '100vw' : "100vw";
+        // document.querySelector('body').style.overflowX = isShowList ? 'hidden' : "hidden";
+    })
+    actionDark.addEventListener("click", (event)=>{
+        mainEl.style.backgroundColor = `#000`;
+        currentShow.style.color = `#000`;
+    })
+    actionWhite.addEventListener("click", (event)=>{
+        mainEl.style.backgroundColor = `#fff`;
+        currentShow.style.color = `#fff`;
+
+    })
+    actionClose.addEventListener("click", (event)=>{
+        action.style.display = "none";
+        actionDark.style.display = "none";
+        actionWhite.style.display = "none";
+        actionClose.style.display = "none";
+    })
+    
+    // 当前选中
+    function setCurrentShow (idx){
+        const nameEl = currentShow.querySelector("#name"),
+        cmykEl = currentShow.querySelector("#CMYK"),
+        rgbEl = currentShow.querySelector("#RGB"),
+        currentItem = initData.colorJson[idx];
+
+        const innerName = "<ruby>" + (
+            currentItem.PY.map((item,index)=>(
+            `${currentItem.name[index]}<rp>(</rp><rt>${item}</rt><rp>)</rp>`
+        )).join('')
+        ) + "</ruby>";
+ 
+        const innerCMYK = `CMYK<pre>${currentItem.CMYK.join('%,')}%</pre>`;
+
+        const innerRGB = `RGB<pre>${currentItem.RGB.join(',')}</pre>`;
+
+
+        nameEl.innerHTML = innerName;
+        cmykEl.innerHTML = innerCMYK;
+        rgbEl.innerHTML = innerRGB;
+        mainEl.style.backgroundColor = `rgb(${currentItem.RGB.join(',')})`;
+
+    }
+
+    
+   
+
+</script>
+
+<script>
+    // ios下 CSS:active
+    document.body.addEventListener('touchstart',function(){});
+     window.onload = ()=>{
+        document.querySelector('body').style.display = 'unset';
+    }
+</script>
